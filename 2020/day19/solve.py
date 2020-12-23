@@ -107,61 +107,128 @@ class Interpretter(object):
         self.msg = msg
         self.msgIdx = 0
 
-    def advanceRule(self, ruleNum):
+    def advanceRule(self, ruleNum, level):
         rule = self.rules[ruleNum]
-        initMsgIdx = self.msgIdx
-        ruleIdx = 0
-        branchIdx = 0
-        while True:
-            branch = None
-            token = None
-            c = None
-            try:
-                branch = rule[branchIdx]
-            except IndexError:
-                #checked all branches for this rule
-                raise InterpretterError()
-            try:
-                token = branch[ruleIdx]
-            except IndexError:
-                #completed tokens for this rule
-                return True
-            try:
-                c = self.msg[self.msgIdx]
-            except IndexError:
-                # print('msg too short')
-                raise InterpretterError
-            # print(ruleNum, rule, branchIdx, ruleIdx, token)
-            # print(self.msgIdx, c, initMsgIdx, self.msg)
-            # input()
-            if token == '"a"' or token == '"b"':
-                if f'"{c}"' == token:
-                    # print('c matches token')
-                    ruleIdx += 1
-                    self.msgIdx += 1
-                    continue
-                else:
-                    #msg does not match this rule
-                    # print('does not match token')
-                    raise InterpretterError
-            else:
+        msgIdx = self.msgIdx
+        initMsgIdx = msgIdx
+        for branchIdx in range(len(rule)):
+            branch = rule[branchIdx]
+            print('checking branch', branchIdx, branch)
+            for tokenIdx in range(len(branch)):
+                token = branch[tokenIdx]
+                print('checking token', tokenIdx, token)
+                c = None
                 try:
-                    self.advanceRule(token)
-                except InterpretterError:
-                    #this branch does not work for the msg
-                    # print('branch does not work')
-                    branchIdx += 1
-                    ruleIdx = 0
-                    self.msgIdx = initMsgIdx
+                    c = self.msg[msgIdx]
+                except IndexError:
+                    #there are more tokens than there are characters in the message, so this branch cannot work
+                    print('exceeded msg length')
+                    break
+                print('checking c', msgIdx, c)
+                if token == '"a"' or token == '"b"':
+                    if f'"{c}"' == token:
+                        print('c', c, 'matches token')
+                        msgIdx += 1
+                        continue
+                    else:
+                        #this token does not match the character, so this branch cannot work
+                        print('c', c, 'does not match token', token)
+                        break
                 else:
-                    ruleIdx += 1
+                    try:
+                        self.advanceRule(token, level+1)
+                    except InterpretterError:
+                        #the rule did not apply for the message, so this branch cannot work
+                        print('token', token, 'failed')
+                        break
+            else:
+                #all tokens matched with the message, so this branch worked
+                print('finished branch', branchIdx, branch, 'success')
+                self.msgIdx = msgIdx
+                if True:
+                    if msgIdx == len(self.msg):
+                        print('end of message')
+                        return True
+                    else:
+                        print('more message remaining, must continue checking')
+                else:
+                    self.msgIdx = msgIdx
+                    return True
+            #branch did not work, so reset msgIdx and try next one
+            print('branch failed', branchIdx, branch)
+            msgIdx = initMsgIdx
+            continue
+        else:
+            #tried all branches and none worked, so this rule doesn't apply
+            print('rule failed', ruleNum, rule)
+            raise InterpretterError
+
+        # while True:
+        #     branch = None
+        #     token = None
+        #     c = None
+        #     try:
+        #         branch = rule[branchIdx]
+        #     except IndexError:
+        #         #checked all branches for this rule
+        #         self.msgIdx = initMsgIdx
+        #         raise InterpretterError()
+        #     try:
+        #         token = branch[ruleIdx]
+        #     except IndexError:
+        #         #checked all tokens for this branch
+
+        #     try:
+        #         c = self.msg[self.msgIdx]
+        #         token = branch[ruleIdx]
+        #     except IndexError:
+        #         print('check', ruleIdx, branch, self.msgIdx)
+        #         if ruleIdx >= len(branch)-1:
+        #             return True
+        #         else:
+        #             branchIdx += 1
+        #             ruleIdx = 0
+        #             self.msgIdx = initMsgIdx
+        #             continue
+        #     print(ruleNum, rule, branchIdx, ruleIdx, token)
+        #     print(self.msgIdx, c, initMsgIdx, self.msg, self.msg[self.msgIdx])
+        #     # input()
+        #     if token == '"a"' or token == '"b"':
+        #         if f'"{c}"' == token:
+        #             print('c matches token')
+        #             self.msgIdx += 1
+        #             if ruleIdx >= len(branch)-1:
+        #                 return True
+        #             else:
+        #                 ruleIdx += 1
+        #                 continue
+        #         else:
+        #             #msg does not match this rule
+        #             print('does not match token')
+        #             branchIdx += 1
+        #             ruleIdx = 0
+        #             self.msgIdx = initMsgIdx
+        #             continue
+        #     else:
+        #         try:
+        #             self.advanceRule(token)
+        #         except InterpretterError:
+        #             #this branch does not work for the msg
+        #             print('branch does not work')
+        #             branchIdx += 1
+        #             ruleIdx = 0
+        #             self.msgIdx = initMsgIdx
+        #             continue
+        #         else:
+        #             ruleIdx += 1
+        #             continue
     
     def run(self):
-        self.advanceRule(0)
+        self.advanceRule(0, 0)
         if self.msgIdx == len(self.msg):
             print('passed')
         else:
-            # print('failed')
+            print('failed')
             raise InterpretterError('failed')
 
 def main():
@@ -178,8 +245,14 @@ def main2():
     t = parseInput2('testInput')
     rules = t[0]
     #this is kind of cheating but oh well, I can't figure it out the normal way.
-    rules[8] = [[42], [42, 42], [42,42,42], [42,42,42,42], [42,42,42,42,42], [42,42,42,42,42,42], [42,42,42,42,42,42,42], [42,42,42,42,42,42,42,42], [42,42,42,42,42,42,42,42,42], [42,42,42,42,42,42,42,42,42,42]]
-    rules[11] = [[42, 31], [42, 11, 31], [42,42,31,31], [42,42,42,31,31,31], [42,42,42,42,31,31,31,31], [42,42,42,42,42,31,31,31,31,31], [42,42,42,42,42,42,31,31,31,31,31,31], [42,42,42,42,42,42,42,31,31,31,31,31,31,31], [42,42,42,42,42,42,42,42,31,31,31,31,31,31,31,31], [42,42,42,42,42,42,42,42,42,31,31,31,31,31,31,31,31,31], [42,42,42,42,42,42,42,42,42,42,31,31,31,31,31,31,31,31,31,31]]
+    MAX_REC = 10
+    rules[8] = []
+    rules[11] = []
+    for i in range(MAX_REC):
+        rules[8].append([42]*(i+1))
+        rules[11].append([42]*(i+1) + [31]*(i+1))
+    # rules[8] = [[42], [42, 42], [42,42,42], [42,42,42,42], [42,42,42,42,42], [42,42,42,42,42,42], [42,42,42,42,42,42,42], [42,42,42,42,42,42,42,42], [42,42,42,42,42,42,42,42,42], [42,42,42,42,42,42,42,42,42,42], [42,42,42,42,42,42,42,42,42,42,42]]
+    # rules[11] = [[42, 31], [42, 11, 31], [42,42,31,31], [42,42,42,31,31,31], [42,42,42,42,31,31,31,31], [42,42,42,42,42,31,31,31,31,31], [42,42,42,42,42,42,31,31,31,31,31,31], [42,42,42,42,42,42,42,31,31,31,31,31,31,31], [42,42,42,42,42,42,42,42,31,31,31,31,31,31,31,31], [42,42,42,42,42,42,42,42,42,31,31,31,31,31,31,31,31,31], [42,42,42,42,42,42,42,42,42,42,31,31,31,31,31,31,31,31,31,31]]
     messages = t[1]
     count = 0
     for msg in messages:
