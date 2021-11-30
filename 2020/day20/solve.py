@@ -8,13 +8,16 @@ def parse(fname):
             rows = []
             for line in lines[1:]:
                 cols = []
-                
+                rows.append(cols)
                 for c in line.strip():
                     cols.append(c)
-                
-        
+            tileData[tileId] = rows
+    return tileData
+
+def getEdge(tile, edge):
+    
 
 def main():
-    parse('input')
-
+    tiles = parse('input')
+    layout = {}
 main()
