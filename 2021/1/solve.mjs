@@ -1,6 +1,6 @@
 import AOCTools from "../tools/AOCTools.mjs";
 
-let input = await AOCTools.parseInput();
+let input = await AOCTools.parseLines();
 
 input = input.map((v) => Number.parseInt(v));
 let prev = null;

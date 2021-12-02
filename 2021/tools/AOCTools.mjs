@@ -6,8 +6,19 @@ export default {
      * @param path 
      * @returns 
      */
-    parseInput: async function(path="input") {
+    parseLines: async function(path="input") {
         let input = await fs.readFile(path);
         return input.toString().split(/\r?\n/);
+    },
+
+    parseSectionsOfLines: async function(path="input") {
+        let input = await fs.readFile(path);
+        return (
+            input.toString()
+            .split(/\r?\n\r?\n/)
+            .map((section) => {
+                return section.split(/\r?\n/);
+            })
+        );
     }
 }
