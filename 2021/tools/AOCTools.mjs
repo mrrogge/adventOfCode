@@ -1,5 +1,7 @@
 import * as fs from "fs/promises";
 
+class SolutionFound extends Error {}
+
 export default {
     /**
      * Reads an input file and parses it into an array of lines as strings.
@@ -20,5 +22,7 @@ export default {
                 return section.split(/\r?\n/);
             })
         );
-    }
+    },
+
+    SolutionFound: SolutionFound
 }
