@@ -22,26 +22,26 @@ maintainer:         5900418+mrrogge@users.noreply.github.com
 extra-source-files: CHANGELOG.md
 
 executable y2015d1p1
-    main-is: y2015d1p1.hs
+    main-is: y2015/d1/p1.hs
     build-depends: base ^>=4.16.3.0
     hs-source-dirs: app
     default-language: Haskell2010
 
 executable y2015d1p2
-    main-is: y2015d1p2.hs
+    main-is: y2015/d1/p2.hs
     build-depends: base ^>=4.16.3.0
     hs-source-dirs: app
     default-language: Haskell2010
 
 executable y2015d2p1
-    main-is: y2015d2p1.hs
+    main-is: y2015/d2/p1.hs
     build-depends: base ^>=4.16.3.0
     hs-source-dirs: app
     default-language: Haskell2010
     other-modules: Utils
 
 executable y2015d2p2
-    main-is: y2015d2p2.hs
+    main-is: y2015/d2/p2.hs
     build-depends: base ^>=4.16.3.0
     hs-source-dirs: app
     default-language: Haskell2010
