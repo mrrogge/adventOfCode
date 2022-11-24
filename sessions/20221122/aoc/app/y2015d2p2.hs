@@ -20,7 +20,7 @@ listToTuple l = (head l, l !! 1, l !! 2)
 
 solve = sum . map (neededRibbon . listToTuple . listOfCharsToListOfNums . strSplit 'x') . strSplit '\n'
 main = do 
-    handle <- openFile "../../inputs/2015/day2/input" ReadMode  
+    handle <- openFile "inputs/2015/day2/input" ReadMode  
     contents <- hGetContents handle
     print $ solve contents
     hClose handle
