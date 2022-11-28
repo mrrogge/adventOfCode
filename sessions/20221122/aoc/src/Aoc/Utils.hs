@@ -1,4 +1,4 @@
-module Utils
+module Aoc.Utils
 ( strSplit
 ) where
 
