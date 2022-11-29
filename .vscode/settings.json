@@ -1,6 +1,0 @@
-{
-    "python.pythonPath": "C:\\Users\\Matt\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
-    "files.watcherExclude": {
-        "**/target": true
-    }
-}
