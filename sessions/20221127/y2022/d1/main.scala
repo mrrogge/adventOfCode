@@ -7,15 +7,10 @@ import scala.io.Source
         x match {
             case "" :: xs => process(List.empty :: acc, xs)
             case x :: xs => {
-                val head = acc match {
-                    case x :: xs => acc.head
-                    case Nil => List.empty
+                acc match {
+                    case accHead :: accTail => process((x :: accHead) :: accTail, xs)
+                    case Nil => process((x :: List.empty) :: List.empty, xs)
                 }
-                val tail = acc match {
-                    case x :: xs => acc.tail
-                    case Nil => List.empty
-                }
-                process((x :: head) :: tail, xs)
             }
             case Nil => acc
         }
