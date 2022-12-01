@@ -30,8 +30,7 @@ import scala.io.Source
 
     println("PART 2")
 
-    val v4 = v2.map(a => a.map(a => a.toInt).fold(0)((a,b)=>a+b)).sorted
+    val v4 = v2.map(_.map(_.toInt).sum).sorted.reverse.take(3).sum
     println(v4)
-    println(69208 + 69434 + 69795)
 
 }
