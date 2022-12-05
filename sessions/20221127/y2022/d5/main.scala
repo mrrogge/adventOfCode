@@ -42,7 +42,7 @@ def stackLineToBlocks(acc:List[Option[Char]], rem:List[Char]):List[Option[Char]]
     })
 
     def updateStacks(qty:Int, source:Int, dest:Int) = {
-        stacks(dest) = stacks(source).take(qty).reverse ++ stacks(dest)
+        stacks(dest) = stacks(source).take(qty) ++ stacks(dest)
         stacks(source) = stacks(source).drop(qty)
     }
 
