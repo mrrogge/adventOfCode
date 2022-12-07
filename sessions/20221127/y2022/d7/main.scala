@@ -1,4 +1,5 @@
 import scala.io.Source
+import scala.annotation.tailrec
 
 // parents, children, sizes, currentPath, lastCmd
 type FS = (Map[String, String], Map[String, Set[String]], Map[String, Int], String, String)
@@ -35,25 +36,12 @@ type FS = (Map[String, String], Map[String, Set[String]], Map[String, Int], Stri
             fs._3(path)
         }
         else {
-            fs._2(path).foldLeft(0)((size, x) => size + getDirSize(fs, x))
+            fs._2(path).toList.map(x => getDirSize(fs, x)).sum
         }
     }
 
     fs = (fs._1, fs._2, fs._3.map((k,_) => (k, getDirSize(fs, k))), fs._4, fs._5)
 
-    def getSumOfSmallDirs(fs:FS, acc:Int, path:String):Int = {
-        println(path)
-        acc 
-        + (if fs._3(path) <= 100000 then {
-            fs._3(path)
-            + (if fs._2.contains(path) then {
-                fs._2(path).map(path => getSumOfSmallDirs(fs, 0, path)).sum
-            }
-            else 0)
-        }
-        else 0)
-    }
-
-    println(fs._3)
-    println(getSumOfSmallDirs(fs, 0, "/"))
+    val v1 = fs._2.map((k,_)=>fs._3(k)).filter(_<=100000).sum
+    println(v1)
 }
