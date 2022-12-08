@@ -47,4 +47,11 @@ type FS = (Map[String, (String, Int)], String, String)
     println(fs._1)
     println(fs._1.values.filter(x => x._1 == "dir").map(_._2).filter(_<=100000).sum)
 
+    val currentUnused = 70000000 - fs._1("/")._2
+    val amountToDel = 30000000 - currentUnused
+
+    println(amountToDel)
+
+    println(fs._1.values.filter(x => x._1 == "dir" && x._2 >=amountToDel).map(_._2).min)
+
 }
