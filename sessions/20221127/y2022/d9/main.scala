@@ -1,11 +1,11 @@
 import scala.io.Source
 
 @main def main = {
-    val moves = Source.fromFile("test2").getLines().map(_.split(" "))
+    val moves = Source.fromFile("input").getLines().map(_.split(" "))
     .map(_.toList match {
         case x1 :: x2 :: Nil => (x1, x2.toInt)
         case _ => throw new Exception
-    })
+    }).toList
 
     case class State (
         cells: Map[Int, Map[Int, Boolean]],
@@ -45,34 +45,52 @@ import scala.io.Source
 
     case class State2 (
         visited: Set[(Int, Int)],
-        nodes: Vector[(Int, Int)],
-        prevNodes: Vector[(Int, Int)]
+        nodes: Vector[(Int, Int)]
     )
 
-    val initState2 = State2(Set((0,0)), Vector.fill(9)((0,0)), Vector.fill(9)((0,0)))
+    val initState2 = State2(Set((0,0)), Vector.fill(10)((0,0)))
 
     def step2(state:State2, dir:String):State2 = {
-        var prevNodes = state.prevNodes.updated(0, state.nodes(0))
         var visited = state.visited
-        val prevHead = prevNodes(0)
+        var nodes = state.nodes
+        val prevHead = nodes(0)
         val newHead = dir match {
             case "L" => (prevHead._1-1, prevHead._2)
             case "R" => (prevHead._1+1, prevHead._2)
             case "U" => (prevHead._1, prevHead._2-1)
             case "D" => (prevHead._1, prevHead._2+1)
         }
-        var nodes = state.nodes.updated(0, newHead)
-        (1 to 8).foreach(i => {
-            prevNodes = prevNodes.updated(i, nodes(i))
-            nodes.updated(i, follow(nodes(i), prevNodes(i-1), nodes(i-1)))
-        })
-        visited = visited + nodes(8)
-        State2(state.visited, nodes, prevNodes)
+        nodes = nodes.updated(0, newHead)
+        for i <- 1 to 9 do {
+            // println(s"$i, ${nodes(i)}, ${nodes(i-1)}")
+            nodes = nodes.updated(i, follow(nodes(i), nodes(i-1)))
+        }
+        visited = visited + nodes(9)
+        State2(visited, nodes)
     }
 
-    def follow(orig:(Int, Int), prevTarget:(Int, Int), newTarget:(Int, Int)):(Int, Int) = {
-        val diff = (Math.abs(newTarget._1-orig._1), Math.abs(newTarget._2-orig._2))
-        if diff._1 > 1 | diff._2 > 1 then prevTarget else orig
+    def follow(orig:(Int, Int), newTarget:(Int, Int)):(Int, Int) = {
+        val diff = (newTarget._1-orig._1, newTarget._2-orig._2)
+        val absDiff = (Math.abs(diff._1), Math.abs(diff._2))
+        if absDiff._1 > 2 | absDiff._2 > 2 then {
+            throw new Exception(s"moved too far, ${orig}, ${newTarget}")
+        }
+        else if absDiff._1 == 2 & absDiff._2 == 2 then {
+            (orig._1+diff._1-Math.signum(diff._1).toInt, orig._2+diff._2-Math.signum(diff._2).toInt)
+        }
+        else if absDiff._1 == 1 & absDiff._2 == 2 then {
+            (orig._1+diff._1, orig._2+diff._2-Math.signum(diff._2).toInt)
+        }
+        else if absDiff._1 ==2 & absDiff._2 == 1 then {
+            (orig._1+diff._1-Math.signum(diff._1).toInt, orig._2+diff._2)
+        }
+        else if absDiff._1 == 0 & absDiff._2 == 2 then {
+            (orig._1, orig._2+diff._2-Math.signum(diff._2).toInt)
+        }
+        else if absDiff._1 == 2 & absDiff._2 == 0 then {
+            (orig._1+diff._1-Math.signum(diff._1).toInt, orig._2)
+        }
+        else orig
     }
 
     val v3 = moves.foldLeft(initState2)((state, move) => {
@@ -83,4 +101,16 @@ import scala.io.Source
 
     println(v4)
 
+    // var v5 = initState2
+    // var move = moves.head
+    // var moveRem = moves.tail
+
+    // for i <- 0 until 8 do {
+    //     for j <- 0 until move._2 do {
+    //         v5 = step2(v5, move._1)
+    //         println(v5)
+    //     }
+    //     move = moveRem.head
+    //     moveRem = moveRem.tail
+    // }
 }
